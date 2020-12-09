@@ -1,0 +1,55 @@
+FROM @make:docker_base_image@
+
+STOPSIGNAL SIGTERM
+
+#^
+#^-- specified by the base image
+#
+#v-- specified by the current image
+#v
+
+ENV     buildroot_user_name=developer
+ENV     buildroot_group_name=developer
+
+ENV     buildroot_docker_image_setup_root=/var/local/workspaces/buildroot/setup
+
+ENV     buildroot_sandboxes_root=/var/local/workspaces/${buildroot_user_name}/sandboxes
+
+ENV     buildroot_home_root=/home/${buildroot_user_name}
+
+VOLUME  [ "${buildroot_sandboxes_root}" ]
+
+##
+
+USER    root
+WORKDIR "${buildroot_docker_image_setup_root}"
+
+COPY    support/ support/
+RUN     ls -alh -R support/
+
+COPY    artifacts.d/ artifacts.d/
+RUN     ls -alh -R artifacts.d/
+
+RUN     support/buildroot-tools/provision.sh
+
+##
+
+USER    root
+WORKDIR "${buildroot_docker_image_setup_root}"
+
+RUN     for f1 in /etc/sudoers.d/group-sudo-no-password-needed ; do \
+		echo '%sudo ALL = NOPASSWD: ALL' > "$f1" ; \
+		chmod 0440 "$f1" ; \
+	done
+
+##
+
+USER    root
+WORKDIR "${buildroot_docker_image_setup_root}"
+
+COPY    start.sh .
+
+ENTRYPOINT ["./start.sh"]
+
+##
+

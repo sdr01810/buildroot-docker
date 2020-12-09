@@ -1,0 +1,15 @@
+*.swp
+*~
+
+.all.*
+.out.*
+.du@*
+.sb.*
+
+/artifacts.d/
+
+Dockerfile
+
+packages.*.filtered.txt
+
+typescript

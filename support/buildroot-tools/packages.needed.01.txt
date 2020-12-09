@@ -1,0 +1,63 @@
+####
+## Bare bones needs
+##
+bash
+less
+perl
+procps
+sudo
+
+####
+## Archive formats
+##
+bzip2
+cpio
+gzip
+tar
+unzip
+zip
+xz-utils
+
+####
+## Downloaders
+## - use curl to download files via HTTP, FTP, etc.
+## - use git to download/clone gists from GitHub
+##
+curl
+wget
+
+####
+## Text editors
+##
+emacs
+vim
+
+####
+## Patch utilities
+##
+colordiff
+patch
+patchutils
+quilt
+
+####
+## Build tools
+##
+build-essential
+
+####
+## Network troubleshooting
+##
+net-tools
+
+####
+## Secure login & file transfer
+##
+openssh-client
+openssh-server
+openssh-sftp-server
+rsync
+
+####
+## Other
+##
