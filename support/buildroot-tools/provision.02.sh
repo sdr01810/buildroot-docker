@@ -6,7 +6,7 @@ set -e -x
 ##
 
 pkg_buildroot_scripts_name=buildroot-scripts
-pkg_buildroot_scripts_version=1.0.0-rc1
+pkg_buildroot_scripts_version=1.0.0-rc2
 pkg_buildroot_scripts_artifact_stem=${pkg_buildroot_scripts_name}-${pkg_buildroot_scripts_version}
 pkg_buildroot_scripts_artifact_depot_url=https://github.com/sdr01810/buildroot-scripts/releases/download
 pkg_buildroot_scripts_artifact_url=${pkg_buildroot_scripts_artifact_depot_url}/v${pkg_buildroot_scripts_version}/${pkg_buildroot_scripts_artifact_stem}.tar.gz
