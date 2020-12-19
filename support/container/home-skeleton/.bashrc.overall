@@ -1,0 +1,62 @@
+##/bin/bash source'd
+## Coordinates the user's overall bash rc setup.
+##
+## By design: login shells and interactive non-login shells have the same setup
+## 
+## By design: sets up common session variables and then sources individual pieces.
+##
+
+bash_rc_overall_requires_terminal_for_interactive_shell_p=t
+
+##
+
+function bash_rc_overall() {
+
+	[ "${BASH_RC_OVERALL_LEVEL:-0}" -lt 1 ] || return # prevent infinite recursion
+
+	BASH_RC_OVERALL_LEVEL=$((++ BASH_RC_OVERALL_LEVEL)) # by design: not exported
+
+	##
+
+	export HOME="${HOME:?missing value for HOME}"
+
+	if [ -n "${PS1}" ] ; then
+
+		# interactive shell
+
+		if [ ! -t 0 -a -n "${bash_rc_overall_requires_terminal_for_interactive_shell_p}" ] ; then
+
+			echo 1>&2 "$(basename "$0"): stdin must be a terminal for an interactive shell; aborting"
+
+			exit 2 # by design: exit, not return
+		fi
+
+		if ! shopt -q login_shell ; then
+
+			# interactive non-login shell; source `.profile` explicitly
+
+			source "${HOME:?}"/.profile # must exist
+		fi
+	fi
+
+	##
+
+	umask 0022
+
+	export USER="${USER:-$(id -un)}"
+
+	! [ -n "${PS1}" ] || cd # ensure all interactive shells start in home directory
+
+	##
+
+	local f1
+
+	for f1 in "${HOME:?}"/.bashrc.[0-9]*[^~] ; do
+
+		[ -e "${f1:?}" ] || continue
+
+		source "${f1:?}"
+	done
+}
+
+bash_rc_overall

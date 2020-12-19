@@ -1,0 +1,32 @@
+##/bin/bash source'd
+## Sets up session variables for our buildroot-based build.
+##
+
+function prepend_to_PATH_if_exists() { # directory_pn
+
+	local d1="${1:?missing value for directory_pn}" ; shift 1
+
+	[ $# -eq 0 ]
+
+	if ! [ -d "${d1:?}" ] ; then
+
+		false
+	else
+		case "::${PATH}::" in
+		*:${d1:?}:*) false ;; *) PATH="${d1:?}${PATH:+:${PATH:?}}" ;;
+		esac
+	fi
+}
+
+function bash_rc_for_buildroot() {
+
+	PS1="${PS1:+\\u@\\h\\$ }"
+	#^-- by design: does not use ANSI terminal escape codes
+
+	##
+
+	prepend_to_PATH_if_exists /opt/qemu-scripts/bin
+	prepend_to_PATH_if_exists /opt/buildroot-scripts/bin
+}
+
+bash_rc_for_buildroot

@@ -22,35 +22,113 @@ function xx_printenv_sorted() {
 	xx printenv | xx env LC_ALL=C sort
 }
 
+function xx_sleep_forever() {
+
+	while true ; do
+
+		xx sleep 3600
+	done
+}
+
 ##
 
 buildroot_ssh_key_type="${buildroot_ssh_key_type:-rsa}"
 
 ##
-## ensure the buildroot user is provisioned:
-##
-
-addgroup "${buildroot_group_name}"
-
-adduser \
-	--shell    "/bin/bash" \
-	--ingroup  "${buildroot_group_name}" \
-	--home     "${buildroot_home_root}" \
-	--gecos    "Used for buildroot-based builds" \
-	--disabled-password \
-	"${buildroot_user_name}"
-
-adduser "${buildroot_user_name}" root
-adduser "${buildroot_user_name}" sudo
-
-##
-## ensure the buildroot user owns its home directory and sandbox (volumes):
+## ensure buildroot user's sandbox is primed and ready
 ## 
 
-xx :
-xx ln -snf "${buildroot_sandboxes_root}" "${buildroot_home_root}"/sandboxes
+(
+	cd "${buildroot_user_sandbox_root}"
 
-for d1 in "${buildroot_home_root}" "${buildroot_sandboxes_root}" ; do
+	for f1 in "${buildroot_docker_image_setup_root}/artifacts"/buildroot-[0-9]* ; do
+
+		[ -e "${f1}" ] || continue
+
+		xx :
+		xx cp "${f1}" .
+	done
+
+	/opt/buildroot-scripts/bin/buildroot install
+
+	for f1 in /opt/buildroot-scripts/share/samples/buildroot.env ; do
+	for f2 in buildroot.env.sample ; do
+
+		! [ -e "${f2}" ] || continue
+
+		xx :
+		xx cp "${f1}" "${f2}"
+	done;done
+
+	for f1 in buildroot-[0-9]* ; do
+	for f2 in "${buildroot_docker_image_setup_root}/artifacts/${f1}" ; do
+
+		[ -f "${f1}" -a -s "${f1}" ] || continue
+
+		xx :
+		xx cp "${f1}" "${f2}"
+	done;done
+)
+
+##
+## update buildroot user's home directory against home.ref
+##
+
+xx :
+xx rsync -i --stats -a -u "${buildroot_user_home_ref}"/ "${buildroot_user_home}"/
+
+##
+## ensure symbolic links to buildroot user's work trees are correct
+##
+
+xx :
+xx ln -snf "${buildroot_user_home_ref}" "${buildroot_user_home}".ref
+
+xx :
+xx ln -snf "${buildroot_user_sandbox_root}" "${buildroot_user_home}"/sandbox
+
+##
+## ensure bash startup files for buildroot user are correct
+##
+
+for f1 in \
+	"${buildroot_user_home}"/.bash_env \
+	"${buildroot_user_home}"/.bash_login \
+	"${buildroot_user_home}"/.bash_logout \
+	"${buildroot_user_home}"/.bash_profile \
+; do
+	[ -e "${f1}" ] || continue
+
+	xx :
+	xx rm "${f1}"
+done
+
+for f1 in \
+	"${buildroot_user_home}"/.bashrc \
+	"${buildroot_user_home}"/.profile \
+; do
+	[ -e "${f1}".overall ] # required
+
+	if [ ! -e "${f1}".00.base ] ; then
+
+		if [ -e "${f1}" ] ; then
+
+			xx :
+			xx mv "${f1}"{,.00.base}
+		else
+			xx :
+			xx cp /dev/null "${f1}".00.base
+		fi
+	fi
+
+	xx :
+	xx ln -snf "$(basename "${f1}".overall)" "${f1}"
+done
+
+## ensure buildroot user owns its home directory, home.ref, and sandbox:
+## 
+
+for d1 in "${buildroot_user_home}" "${buildroot_user_home_ref}" "${buildroot_user_sandbox_root}" ; do
 
 	xx :
 	xx mkdir -p "${d1}" ; xx chmod ug+w,o-w "${d1}"
@@ -59,21 +137,33 @@ for d1 in "${buildroot_home_root}" "${buildroot_sandboxes_root}" ; do
 done
 
 ##
-## generate an ssh key for the buildroot user on demand:
+## ensure buildroot user has an ssh key:
 ##
 
-for k1 in "${buildroot_home_root:?}/.ssh/id_${buildroot_ssh_key_type:?}" ; do
+for k1 in "${buildroot_user_home:?}/.ssh/id_${buildroot_ssh_key_type:?}" ; do
 
 	! [ -s "${k1:?}" -a -s "${k1:?}".pub ] || continue
 
-	su -c "set -x ; : ; ssh-keygen -t '${buildroot_ssh_key_type:?}' -f '${k1:?}' -N ''" "${buildroot_user_name:?}"
+	su -c "
+		set -x && : && 
+
+		ssh-keygen -t $(printf %q "${buildroot_ssh_key_type:?}") -f $(printf %q "${k1:?}") -N ''
+
+	" "${buildroot_user_name:?}" ;
 done
 
 xx :
-xx ls -al "${buildroot_home_root:?}"/.ssh
+xx ls -al "${buildroot_user_home:?}"/.ssh
 
 ##
-## configure git on demand:
+## update buildroot user's home.ref against home directory (note: exports ssh key)
+##
+
+xx :
+xx rsync -i --stats -a -u "${buildroot_user_home}"/ "${buildroot_user_home_ref}"/
+
+##
+## configure git on demand for root:
 ##
 
 if command -v git >/dev/null ; then
@@ -97,7 +187,7 @@ xx_printenv_sorted
 ##
 
 xx :
-xx cd "${buildroot_docker_image_setup_root:?}"
+xx cd "${buildroot_user_home:?}"
 
 if [ $# -gt 0 ] ; then
 
@@ -112,6 +202,11 @@ if [ -t 0 ] ; then
 	echo "Launching shell as ${buildroot_user_name:?}..."
 	xx :
 	xx exec su -c 'bash -l' "${buildroot_user_name:?}"
+else
+	echo
+	echo "Sleeping forever..."
+	xx :
+	xx_sleep_forever
 fi;fi
 
 ##

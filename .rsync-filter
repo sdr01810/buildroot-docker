@@ -1,0 +1,7 @@
+- *.swp
+- .*#
+- *#
+
+- /artifacts/
+- /scratch*/
+

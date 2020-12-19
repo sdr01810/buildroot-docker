@@ -1,10 +1,12 @@
-**/.[^.]*
-
 **/*~
 **/*.swp
 
-**/Docker*
-**/Make*
+**/.all.*
+**/.out.*
+**/.sb.*
+
+**/scratch*
 
 **/typescript
 
+.git

@@ -1,0 +1,10 @@
+##/bin/bash source'd
+## Sets up login-only session variables for our buildroot-based build.
+##
+
+function sh_profile_for_buildroot() {
+
+	: # nothing yet
+}
+
+sh_profile_for_buildroot

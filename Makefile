@@ -18,7 +18,7 @@ clean ::
 
 clobber :: clean
 
-build :: Dockerfile Makefile $(shell ls 2>&- *.md *.sh artifacts.d/* support/buildroot-tools/*.sh support/buildroot-tools/*.txt)
+build :: Dockerfile Makefile $(shell find *.md *.sh artifacts support ! -type d -name '*[_0-9a-zA-Z]')
 	docker build ${docker_build_args_extra} --tag "${image_tag}" .
 
 test :: build
@@ -30,7 +30,8 @@ push ::
 ##
 
 Dockerfile : Dockerfile.in
-	cat $< | perl -pe "s/[@]make:docker_base_image[@]/${docker_base_image}/" > $@
+	(echo "##" ; echo "## THIS IS A GENERATED FILE. DO NOT EDIT." ; echo "##" ; echo "") | \
+	cat /dev/stdin "$<" | perl -pe "s/[@]make:docker_base_image[@]/${docker_base_image}/" > "$@"
 
 clean ::
 	rm -f Dockerfile

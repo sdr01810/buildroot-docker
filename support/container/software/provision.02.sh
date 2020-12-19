@@ -17,23 +17,23 @@ pkg_qemu_scripts_artifact_stem=${pkg_qemu_scripts_name}-${pkg_qemu_scripts_versi
 pkg_qemu_scripts_artifact_depot_url=https://github.com/sdr01810/qemu-scripts/releases/download
 pkg_qemu_scripts_artifact_url=${pkg_qemu_scripts_artifact_depot_url}/v${pkg_qemu_scripts_version}/${pkg_qemu_scripts_artifact_stem}.tar.gz
 
-mkdir -p artifacts.d
+mkdir -p artifacts
 
 mkdir -p /opt
 
 ##
 
-wget -O "artifacts.d/${pkg_buildroot_scripts_artifact_stem}.tar.gz" "${pkg_buildroot_scripts_artifact_url}"
+wget -O "artifacts/${pkg_buildroot_scripts_artifact_stem}.tar.gz" "${pkg_buildroot_scripts_artifact_url}"
 
-tar xzf "artifacts.d/${pkg_buildroot_scripts_artifact_stem}.tar.gz" -C /opt
+tar xzf "artifacts/${pkg_buildroot_scripts_artifact_stem}.tar.gz" -C /opt
 
 ln -snf "${pkg_buildroot_scripts_artifact_stem}" "/opt/${pkg_buildroot_scripts_name}"
 
 ##
 
-wget -O "artifacts.d/${pkg_qemu_scripts_artifact_stem}.tar.gz" "${pkg_qemu_scripts_artifact_url}"
+wget -O "artifacts/${pkg_qemu_scripts_artifact_stem}.tar.gz" "${pkg_qemu_scripts_artifact_url}"
 
-tar xzf "artifacts.d/${pkg_qemu_scripts_artifact_stem}.tar.gz" -C /opt
+tar xzf "artifacts/${pkg_qemu_scripts_artifact_stem}.tar.gz" -C /opt
 
 ln -snf "${pkg_qemu_scripts_artifact_stem}" "/opt/${pkg_qemu_scripts_name}"
 

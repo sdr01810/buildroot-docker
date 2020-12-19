@@ -1,4 +1,6 @@
 *.swp
+.#*
+*#
 *~
 
 .all.*
@@ -6,7 +8,8 @@
 .du@*
 .sb.*
 
-/artifacts.d/
+/artifacts/
+/scratch*/
 
 Dockerfile
 
