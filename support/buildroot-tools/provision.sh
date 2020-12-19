@@ -6,14 +6,7 @@
 ##     support/buildroot-tools/provision.sh
 ##
 
-set -e -x
-
-##
-
-this_script_fpn="$(realpath "${0:?}")"
-
-this_script_dpn="$(dirname "${this_script_fpn:?}")"
-this_script_fbn="$(basename "${this_script_fpn:?}")"
+. "$(dirname "$0")/provision.prolog.sh"
 
 ##
 

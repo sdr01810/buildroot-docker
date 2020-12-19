@@ -1,7 +1,7 @@
 #!/bin/sh
 ##
 
-set -e -x
+. "$(dirname "$0")/provision.prolog.sh"
 
 ##
 
