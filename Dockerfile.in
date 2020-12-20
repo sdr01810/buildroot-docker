@@ -37,6 +37,13 @@ COPY    support/container/software/ support/container/software/
 
 RUN     sh support/container/software/provision.sh
 
+RUN     for d1 in support/container/software/artifacts ; do for d2 in artifacts ; do \
+	\
+		mv -vf "${d1}"/* "${d2}"/. ; \
+	\
+		rm -rf "${d1}" ; \
+	done;done
+
 ##
 ## ensure members of group sudo don't need to authenticate further
 ## 
