@@ -6,6 +6,10 @@ set -e
 
 umask 0022
 
+echo "STATE: STARTING"
+
+##
+
 function xx() {
 
 	echo 1>&2 "+" "$@"
@@ -192,19 +196,19 @@ xx cd "${buildroot_user_home:?}"
 if [ $# -gt 0 ] ; then
 
 	echo
-	echo "Running command as root..."
+	echo "STATE: RUNNING COMMAND; USER = root; COMMAND = ${@}"
 	xx :
 	xx exec "$@"
 else
 if [ -t 0 ] ; then
 
 	echo
-	echo "Launching shell as ${buildroot_user_name:?}..."
+	echo "STATE: RUNNING LOGIN SHELL; USER = ${buildroot_user_name:?}"
 	xx :
 	xx exec su -c 'bash -l' "${buildroot_user_name:?}"
 else
 	echo
-	echo "Sleeping forever..."
+	echo "STATE: READY"
 	xx :
 	xx_sleep_forever
 fi;fi
