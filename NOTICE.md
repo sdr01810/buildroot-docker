@@ -3,6 +3,7 @@ Copyright 2020 Stephen D. Rogers
 Licensed under the BSD 3-Clause License (the "License"); you may not use
 this file except in compliance with the License.  You may obtain a copy of
 the License at
+
      https://opensource.org/licenses/BSD-3-Clause
 
 Software distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,4 +12,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 This code base has the following third-party source code dependencies:
-- None yet.
+
+- None yet

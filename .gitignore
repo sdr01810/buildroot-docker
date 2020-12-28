@@ -8,11 +8,16 @@
 .du@*
 .sb.*
 
+.ts.*
+scratch
+scratch-*
+scratch.*
+
+typescript
+
 /artifacts/
 /scratch*/
 
 Dockerfile
 
 packages.*.filtered.txt
-
-typescript
