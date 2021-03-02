@@ -1,4 +1,4 @@
-##/bin/bash source'd
+#!/bin/bash sourced
 ## Sets up login-only session variables for our buildroot-based build.
 ##
 

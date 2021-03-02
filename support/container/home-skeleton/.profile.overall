@@ -1,4 +1,4 @@
-##/bin/bash source'd
+#!/bin/bash sourced
 ## Coordinates the user's overall sh and/or bash login setup.
 ## 
 ## By design: sets up login session variables and then sources individual pieces.

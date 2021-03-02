@@ -1,4 +1,4 @@
-##/bin/bash source'd
+#!/bin/bash sourced
 ## Coordinates the user's overall bash rc setup.
 ##
 ## By design: login shells and interactive non-login shells have the same setup
