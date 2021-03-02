@@ -10,19 +10,22 @@ STOPSIGNAL SIGTERM
 
 ENV     buildroot_user_name=developer
 ENV     buildroot_group_name=developer
+ENV     buildroot_account_description="Developer account"
 
-ENV     buildroot_user_home_ref=/v/home.ref
+#
 
-ENV     buildroot_user_sandbox_root=/v/sandbox
+ENV     buildroot_docker_image_setup_root=/v/setup.buildroot
+VOLUME  [ "${buildroot_docker_image_setup_root}" ]
 
 ENV     buildroot_user_home=/home/${buildroot_user_name}
 
-ENV     buildroot_docker_image_setup_root=/v/setup.buildroot
+ENV     buildroot_user_home_ref=/v/home.ref
+VOLUME  [ "${buildroot_user_home_ref}" ]
 
-VOLUME  [ \
-		"${buildroot_user_sandbox_root}" \
-		"${buildroot_user_home_ref}" \
-	]
+ENV     buildroot_user_sandbox_root=/v/sandbox
+VOLUME  [ "${buildroot_user_sandbox_root}" ]
+
+ENV     buildroot_install_might_fail_p=t
 
 ##
 ## ensure everything is installed
@@ -31,18 +34,19 @@ VOLUME  [ \
 USER    root
 WORKDIR "${buildroot_docker_image_setup_root}"
 
+COPY    support/container/software/provision.prolog.sh support/container/software/
+
+COPY    support/container/software/packages.*.txt support/container/software/
+
+COPY    support/container/software/provision.01.sh support/container/software/
+RUN     sh support/container/software/provision.01.sh
+
 COPY    artifacts/ artifacts/
 
-COPY    support/container/software/ support/container/software/
+COPY    support/container/software/provision.02.sh support/container/software/
+RUN     sh support/container/software/provision.02.sh
 
-RUN     sh support/container/software/provision.sh
-
-RUN     for d1 in support/container/software/artifacts ; do for d2 in artifacts ; do \
-	\
-		mv -vf "${d1}"/* "${d2}"/. ; \
-	\
-		rm -rf "${d1}" ; \
-	done;done
+COPY    support/container/software/etc/ support/container/software/etc/
 
 ##
 ## ensure members of group sudo don't need to authenticate further
@@ -51,7 +55,8 @@ RUN     for d1 in support/container/software/artifacts ; do for d2 in artifacts 
 USER    root
 WORKDIR "${buildroot_docker_image_setup_root}"
 
-RUN     for f1 in /etc/sudoers.d/group-sudo-no-password-needed ; do \
+RUN     ! [ -d /etc/sudoers.d ] || \
+	for f1 in /etc/sudoers.d/group-sudo-no-password-needed ; do \
         \
 		echo '%sudo ALL = NOPASSWD: ALL' > "$f1" ; \
 		chmod 0440 "$f1" ; \
@@ -68,9 +73,9 @@ RUN     addgroup "${buildroot_group_name}"
 
 RUN     adduser \
 		--shell    "/bin/bash" \
-		--ingroup  "${buildroot_group_name}" \
 		--home     "${buildroot_user_home}" \
-		--gecos    "Used for buildroot-based builds" \
+		--ingroup  "${buildroot_group_name}" \
+		--gecos    "${buildroot_account_description}" \
 		--disabled-password \
 		"${buildroot_user_name}"
 
@@ -87,8 +92,6 @@ USER    root
 WORKDIR "${buildroot_docker_image_setup_root}"
 
 COPY    ./ ./
-
-RUN     ls -alh -R
 
 ##
 ## establish entry point
