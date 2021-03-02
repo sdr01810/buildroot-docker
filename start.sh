@@ -6,6 +6,7 @@ set -e
 
 umask 0022
 
+echo
 echo "STATE: STARTING"
 
 ##
@@ -45,29 +46,17 @@ buildroot_ssh_key_type="${buildroot_ssh_key_type:-rsa}"
 (
 	cd "${buildroot_user_sandbox_root}"
 
-	for f1 in "${buildroot_docker_image_setup_root}/artifacts"/buildroot-[0-9]* ; do
+	for f1 in "/opt/${pkg_buildroot_scripts_name}"/bin/buildroot ; do
 
-		[ -e "${f1}" ] || continue
+		[[ -e ${f1} ]] || continue
 
-		xx :
-		xx cp "${f1}" .
+		"${f1:?}" install || [[ -n ${buildroot_install_might_fail_p} ]]
 	done
 
-	/opt/buildroot-scripts/bin/buildroot install
-
-	for f1 in /opt/buildroot-scripts/share/samples/buildroot.env ; do
+	for f1 in "/opt/${pkg_buildroot_scripts_name}"/share/samples/buildroot.env ; do
 	for f2 in buildroot.env.sample ; do
 
-		! [ -e "${f2}" ] || continue
-
-		xx :
-		xx cp "${f1}" "${f2}"
-	done;done
-
-	for f1 in buildroot-[0-9]* ; do
-	for f2 in "${buildroot_docker_image_setup_root}/artifacts/${f1}" ; do
-
-		[ -f "${f1}" -a -s "${f1}" ] || continue
+		[[ -e ${f1} && ! -e ${f2} ]] || continue
 
 		xx :
 		xx cp "${f1}" "${f2}"
