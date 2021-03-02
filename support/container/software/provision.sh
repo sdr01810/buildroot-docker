@@ -6,11 +6,11 @@
 ##     support/buildroot-tools/provision.sh
 ##
 
-. "$(dirname "$0")/provision.prolog.sh"
+. "$(dirname "$0")"/provision.prolog.sh
 
 ##
 
-for x1 in "${this_script_dpn:?}"/provision.*.sh ; do
+for x1 in "${this_script_dpn:?}"/provision.[0-9]*.sh ; do
 
-	(. "${x1:?}")
+	"${x1:?}"
 done
