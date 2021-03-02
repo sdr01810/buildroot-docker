@@ -48,6 +48,9 @@ RUN     sh support/container/software/provision.02.sh
 
 COPY    support/container/software/etc/ support/container/software/etc/
 
+COPY    support/container/software/provision.03.sh support/container/software/
+RUN     bash support/container/software/provision.03.sh
+
 ##
 ## ensure members of group sudo don't need to authenticate further
 ## 
